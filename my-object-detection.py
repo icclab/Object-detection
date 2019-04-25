@@ -1,6 +1,7 @@
 from __future__ import print_function
 from function.realtime import *
 from function.video import *
+from function.videostream import *
 import argparse
 import os
 
@@ -30,11 +31,18 @@ if __name__ == '__main__':
                         default=0, help='Print logger debug')
     ap.add_argument('-f', '--fullscreen', dest='full_screen', type=int,
                         default=0, help='enable full screen')
+    ap.add_argument('-s', '--streaming-input', dest='streaming', type=int,
+                    default=0, help='receive input from gstreamer sink')
+    ap.add_argument("-osh", "--output-stream-host", dest='output-stream-host', type=str, default="127.0.0.1", help="Name of the output stream host (udp sink)")
+    ap.add_argument("-osp", "--output-stream-port", dest='output-stream-port', type=int, default=5000, help="Name of the output stream port (udp sink)")
     args = vars(ap.parse_args())
 
     # Use realtime function if no video has been provided
     if args['input_videos'] == "":
-        realtime(args)
+        if  args['streaming'] == 0:
+          realtime(args)
+        else:
+          streaming(args)
 
     # Use video function else
     else:

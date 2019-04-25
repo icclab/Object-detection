@@ -26,6 +26,8 @@ RUN apt-get -qq update && apt-get -qq install --no-install-recommends -y python3
  vim \
  ffmpeg \
  unzip \
+ libgstreamer1.0-dev \
+ libgstreamer-plugins-base1.0-dev \
  && rm -rf /var/lib/apt/lists/* 
 
 # Install core packages 
@@ -60,17 +62,20 @@ RUN cd /usr/local/src/ \
 RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
 
 # Download & build OpenCV
-RUN wget -q -P /usr/local/src/ --no-check-certificate https://github.com/opencv/opencv/archive/3.4.1.zip
+RUN wget -q -P /usr/local/src/ --no-check-certificate https://github.com/opencv/opencv/archive/4.1.0.zip
 RUN cd /usr/local/src/ \
- && unzip 3.4.1.zip \
- && rm 3.4.1.zip \
- && cd /usr/local/src/opencv-3.4.1/ \
+ && unzip 4.1.0.zip \
+ && rm 4.1.0.zip \
+ && cd /usr/local/src/opencv-4.1.0/ \
  && mkdir build \
- && cd /usr/local/src/opencv-3.4.1/build \ 
- && cmake -D CMAKE_INSTALL_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local/ .. \
+ && cd /usr/local/src/opencv-4.1.0/build \ 
+ && cmake -D CMAKE_INSTALL_TYPE=Release -D WITH_GSTREAMER=ON -D CMAKE_INSTALL_PREFIX=/usr/local/ .. \
  && make -j4 \
  && make install \
- && rm -rf /usr/local/src/opencv-3.4.1
+ && rm -rf /usr/local/src/opencv-4.1.0
+
+# add gstreamer
+RUN apt-get -qq update && apt-get -qq install gstreamer-tools libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa  gstreamer1.0-pulseaudio
 
 # Setting up working directory 
 RUN mkdir /lab
