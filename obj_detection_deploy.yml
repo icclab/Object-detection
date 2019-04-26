@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: obj-detection-deployment
+  namespace: ecrp
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: obj-detection
+      labels:
+        name: obj-detection
+    spec:
+      containers:
+      - name: obj-detection
+        image: robopaas/realtime-objectdetection:kube
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+          name: gstreamer
+        env:
+        - name: JANUS_HOST
+          value: "160.85.37.148"
+        - name: JANUS_PORT
+          value: "8004"
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1"

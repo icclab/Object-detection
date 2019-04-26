@@ -33,7 +33,7 @@ def streaming(args):
     # Define the output codec and create VideoWriter object
     print("Will stream to: " + args['output-stream-host'] + ":" + str(args["output-stream-port"]))
     out = cv2.VideoWriter('appsrc ! videoconvert ! x264enc tune=zerolatency ! rtph264pay ! udpsink host=' + args['output-stream-host'] + ' port=' + str(args["output-stream-port"]) , cv2.CAP_GSTREAMER, 0, 10, (320,240), True)
-
+    print("Output stream created")
 
     # Start reading and treating the video stream
     if args["display"] > 0:
@@ -48,6 +48,7 @@ def streaming(args):
         # Capture frame-by-frame
         ret, frame = vs.read()
         countFrame = countFrame + 1
+        print("Framecount:" + str(countFrame))
         if ret:
             input_q.put(frame)
             output_rgb = cv2.cvtColor(output_q.get(), cv2.COLOR_RGB2BGR)
@@ -64,14 +65,10 @@ def streaming(args):
                 cv2.imshow("frame", output_rgb)
 
                 fps.update()
-            elif countFrame >= args["num_frames"]:
-                break
-
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                  break
         else:
-            break
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+            pass
 
     # When everything done, release the capture
     fps.stop()
