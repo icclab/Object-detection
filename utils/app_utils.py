@@ -102,3 +102,21 @@ class GstreamerVideoStream(WebcamVideoStream):
         # initialize the variable used to indicate if the thread should
         # be stopped
         self.stopped = False
+        self.pos = 0
+        
+       
+    def read(self):
+        # return the frame most recently read
+        return self.grabbed, self.frame, self.pos
+    
+    # override to return false if no new frames are coming 
+    def update(self):
+        # keep looping infinitely until the thread is stopped
+        while True:
+            # if the thread indicator variable is set, stop the thread
+            if self.stopped:
+                return
+                    
+            # otherwise, read the next frame from the stream
+            self.pos = self.getFramePosition()
+            (self.grabbed, self.frame) = self.stream.read()

@@ -5,6 +5,7 @@ import argparse
 import multiprocessing
 from multiprocessing import Queue, Pool
 import cv2
+import time
 
 def streaming(args):
     """
@@ -44,12 +45,15 @@ def streaming(args):
         print()
 
     countFrame = 0
+    pre_pos = -1
     while True:
         # Capture frame-by-frame
-        ret, frame = vs.read()
-        countFrame = countFrame + 1
-        print("Framecount:" + str(countFrame))
-        if ret:
+        ret, frame, pos = vs.read()
+        # print(pos, pre_pos)
+        if (ret and pos > pre_pos):
+            pre_pos = pos;
+            countFrame = countFrame + 1
+            print("Framecount:" + str(countFrame))
             input_q.put(frame)
             output_rgb = cv2.cvtColor(output_q.get(), cv2.COLOR_RGB2BGR)
 
@@ -68,7 +72,7 @@ def streaming(args):
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                   break
         else:
-            pass
+            time.sleep(1)
 
     # When everything done, release the capture
     fps.stop()
